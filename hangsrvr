@@ -22,12 +22,15 @@ global hidden
 global actual_word
 global word_not_set
 global counter
+global cur_player
+
 #------------------------
 # initialization of global variables
 counter = 0
 word_not_set = True
 actual_word = '*'
 hidden = ''
+cur_player = '' 
 
 #------------------------
 # Program constants
@@ -56,8 +59,16 @@ def broadcast( clients , message , sock , addr):
         if (tokens[0] == 'SETWRD'):
             handle_setword( client , message , sock , addr , tokens[0])
 
+        if( message == '!^q!' and str(client) == str(cur_player)):
+            sock.sendto("\nYou Won! Congratulations!\n".encode() , client)
+
+        elif( message == '!^q!'):
+            sock.sendto("\nYou were HANGED! Game Over!\n".encode() , client)
+
         else:
-            sock.sendto(message.encode() , client)
+            if( message != '!^q!' ):
+                sock.sendto(message.encode() , client)
+            
 
 def handle_setword( client , message , sock , addr , word):
     
@@ -94,11 +105,14 @@ def player_quit(clients , servsocket , addr , player):
 
 def setwrd(clients , servsocket , addr , player , word):
 
-    global word_not_set , actual_word , counter , hidden
+    global word_not_set , actual_word , counter , hidden , cur_player
 
     if(word_not_set == True):
 
         counter = INIT_COUNT
+        cur_player = str(addr)
+
+        print("this is the current player: " + cur_player)
 
         message = player + " has set a word in play.\n"
         print(message)
@@ -163,7 +177,7 @@ while True:
             elif tokens[1] == 'SETWRD':
 
                 player = tokens[0]
-                word = tokens[2]
+                word = tokens[2].lower()
 
                 setwrd(clients , servsocket , addr , player , word)
 
@@ -213,14 +227,24 @@ while True:
                 if counter == 0:
 
                     print("GAME OVER " + str(counter) )
-                    message = "You have been HANGED!\nThe word has been displayed.\n"
+
+                    #------------- this block sends the right message to the player who
+                    #------------- won or lost
+                    won = "!^q!"
+                    broadcast(clients , won , servsocket , cur_player)
+                    message = "The word has been displayed.\n"
                     broadcast(clients , message , servsocket , addr)
+                    #------------------------------------------------------------------
+
                     set = SETWRD2 + actual_word + " False"
                     broadcast(clients , set , servsocket , addr)
+
+                    cur_player = '' #resets the current player
 
                 hidden = temp
                     
                 if (hidden == actual_word):
+
                     win_image = CNTR + " W" 
                     winmsg = tokens[0] + " guessed the word!!\n" 
                     broadcast(clients , win_image , servsocket , addr)
@@ -261,15 +285,24 @@ while True:
 
                     broadcast(clients , message , servsocket , addr) # message to all players that someone failed a guess
                     broadcast(clients , message2 , servsocket , addr)
-                    broadcast(clients , message3 , servsocket , addr)
+                    broadcast(clients , message3 , servsocket , addr) # updates every player with the counter
 
                     if counter == 0:
 
                         print("GAME OVER " + str(counter) )
-                        message = "You have been HANGED!\nThe word has been displayed.\n"
+
+                    #------------- this block sends the right message to the player who
+                    #------------- won or lost
+                        won = "!^q!"
+                        broadcast(clients , won , servsocket , cur_player)
+                        message = "The word has been displayed.\n"
                         broadcast(clients , message , servsocket , addr)
+                    #-------------
+
                         set = SETWRD2 + actual_word + " False"
                         broadcast(clients , set , servsocket , addr)
+
+                        cur_player = '' #resets the current player
 
             elif tokens[1] == 'RANDOMWRD':
 
