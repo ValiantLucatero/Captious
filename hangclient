@@ -46,15 +46,13 @@ def recieveMsg( name , sock , chat ):
     s.config( command = text.yview)
     text.pack(side = LEFT)
 
-    print( str(quit) )
-
     while quit == False:
 
         try:
             msg , addr = sock.recvfrom( 1024 )
             message = msg.decode()
             tokens = message.split()
-            print(message + " FROM SERVER")
+            #print(message + " FROM SERVER") #this is to track the msgs from the server
 
         except ConnectionResetError:
 
@@ -94,7 +92,7 @@ def recieveMsg( name , sock , chat ):
 
         elif  tokens[0] == 'SETWRD':
 
-            print("I ENTERED SETWORD")
+            #print("I ENTERED SETWORD") #-trace statement
             block.delete(1.0 , 'end')
             block.insert(INSERT , tokens[1])
 
@@ -102,7 +100,7 @@ def recieveMsg( name , sock , chat ):
 
             check_set(tokens[2])
 
-            print("I ENTERED SETWORD2")
+            #print("I ENTERED SETWORD2") #-trace statement
 
             block.delete(1.0 , 'end')
             block.insert(INSERT , tokens[1])
@@ -111,7 +109,7 @@ def recieveMsg( name , sock , chat ):
             
             check_set(tokens[2])
 
-            print("I ENTERED UDPATE")
+            #print("I ENTERED UDPATE") #-trace statement
             actualwrd = tokens[1]
 
         elif tokens[0] == 'RLET':
@@ -123,7 +121,7 @@ def recieveMsg( name , sock , chat ):
                 usedletter.delete(1.0 , 'end')
                 used_bar = 'True'
 
-            print("I ENTERED RLET")
+            #print("I ENTERED RLET") #-trace statement
             letter = tokens[1].upper()
             usedletter.insert(INSERT , letter )
 
