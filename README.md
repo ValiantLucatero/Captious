@@ -20,10 +20,6 @@ Features:
 -New players joining the game will be updated once a player takes a game action.
 -If just one player is connected, that player can play alone and let the server set a word.
 
-WOW FACTOR:
-
-All images are made by me...? dont know if that counts as 'wow'.
-(At first i thought my GUI was gonna be the wow factor... but after seeing the rest, tough competition.)
 
 Video Demo:
 
